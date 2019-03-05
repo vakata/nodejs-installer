@@ -43,12 +43,6 @@ class NodeJsPlugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            ScriptEvents::POST_INSTALL_CMD => array(
-                array('onPostUpdateInstall', 1),
-            ),
-            ScriptEvents::POST_UPDATE_CMD => array(
-                array('onPostUpdateInstall', 1),
-            ),
             self::DOWNLOAD_NODEJS_EVENT => array(
                 array('onPostUpdateInstall', 1)
             )
