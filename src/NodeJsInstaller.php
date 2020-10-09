@@ -144,17 +144,9 @@ class NodeJsInstaller
     public function getNodeJSUrl($version)
     {
         if (Environment::isWindows() && Environment::getArchitecture() == 32) {
-            if (version_compare($version, '4.0.0') >= 0) {
-                return "https://nodejs.org/dist/v".$version."/win-x86/node.exe";
-            } else {
-                return "https://nodejs.org/dist/v".$version."/node.exe";
-            }
+            return "https://nodejs.org/dist/v".$version."/node-v".$version."-win-x86.zip";
         } elseif (Environment::isWindows() && Environment::getArchitecture() == 64) {
-            if (version_compare($version, '4.0.0') >= 0) {
-                return "https://nodejs.org/dist/v" . $version . "/win-x64/node.exe";
-            } else {
-                return "https://nodejs.org/dist/v" . $version . "/x64/node.exe";
-            }
+            return "https://nodejs.org/dist/v".$version."/node-v".$version."-win-x64.zip";
         } elseif (Environment::isMacOS() && Environment::getArchitecture() == 32) {
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-darwin-x86.tar.gz";
         } elseif (Environment::isMacOS() && Environment::getArchitecture() == 64) {
@@ -218,7 +210,7 @@ class NodeJsInstaller
             throw new NodeJsInstallerException("'$targetDirectory' is not writable");
         }
 
-        if (!Environment::isWindows()) {
+        if (true || !Environment::isWindows()) {
             // Now, if we are not in Windows, let's untar.
             $this->extractTo($fileName, $targetDirectory);
 
