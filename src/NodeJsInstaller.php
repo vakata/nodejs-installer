@@ -1,6 +1,7 @@
 <?php
 namespace Mouf\NodeJsInstaller;
 
+use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Util\RemoteFilesystem;
 
@@ -14,10 +15,10 @@ class NodeJsInstaller
 
     protected $rfs;
 
-    public function __construct(IOInterface $io)
+    public function __construct(IOInterface $io, Config $config)
     {
         $this->io = $io;
-        $this->rfs = new RemoteFilesystem($io);
+        $this->rfs = new RemoteFilesystem($io, $config);
     }
 
     /**
