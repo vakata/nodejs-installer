@@ -28,11 +28,13 @@ class NodeJsPlugin implements PluginInterface, EventSubscriberInterface
      * @var IOInterface
      */
     protected $io;
+    protected $config;
 
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->config = $composer->getConfig();
     }
 
     /**
@@ -84,7 +86,7 @@ class NodeJsPlugin implements PluginInterface, EventSubscriberInterface
         $this->verboseLog("<info>NodeJS installer:</info>");
         $this->verboseLog(" - Requested version: ".$versionConstraint);
 
-        $nodeJsInstaller = new NodeJsInstaller($this->io);
+        $nodeJsInstaller = new NodeJsInstaller($this->io, $this->config);
 
         $isLocal = false;
 
@@ -175,7 +177,7 @@ class NodeJsPlugin implements PluginInterface, EventSubscriberInterface
      */
     private function installBestPossibleLocalVersion(NodeJsInstaller $nodeJsInstaller, $versionConstraint, $targetDir)
     {
-        $nodeJsVersionsLister = new NodeJsVersionsLister($this->io);
+        $nodeJsVersionsLister = new NodeJsVersionsLister($this->io, $this->config);
         $allNodeJsVersions = $nodeJsVersionsLister->getList();
 
         $nodeJsVersionMatcher = new NodeJsVersionMatcher();
