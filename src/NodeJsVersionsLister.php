@@ -18,10 +18,10 @@ class NodeJsVersionsLister
 
     const NODEJS_DIST_URL = "https://nodejs.org/dist/";
 
-    public function __construct(IOInterface $io)
+    public function __construct(IOInterface $io, $config)
     {
         $this->io = $io;
-        $this->rfs = new RemoteFilesystem($io);
+        $this->rfs = new RemoteFilesystem($io, $config);
     }
 
     public function getList()
