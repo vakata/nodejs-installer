@@ -148,9 +148,11 @@ class NodeJsInstaller
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-win-x86.zip";
         } elseif (Environment::isWindows() && Environment::getArchitecture() == 64) {
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-win-x64.zip";
+        }elseif (Environment::isMacOS() && Environment::isArm() == 64) {
+            return "https://nodejs.org/dist/v".$version."/node-v".$version."-darwin-arm64.tar.gz";
         } elseif (Environment::isMacOS() && Environment::getArchitecture() == 32) {
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-darwin-x86.tar.gz";
-        } elseif (Environment::isMacOS() && Environment::getArchitecture() == 64) {
+        }  elseif (Environment::isMacOS() && Environment::getArchitecture() == 64) {
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-darwin-x64.tar.gz";
         } elseif (Environment::isSunOS() && Environment::getArchitecture() == 32) {
             return "https://nodejs.org/dist/v".$version."/node-v".$version."-sunos-x86.tar.gz";
@@ -211,49 +213,12 @@ class NodeJsInstaller
             throw new NodeJsInstallerException("'$targetDirectory' is not writable");
         }
 
-        if (true || !Environment::isWindows()) {
-            // Now, if we are not in Windows, let's untar.
-            $this->extractTo($fileName, $targetDirectory);
-
-            // Let's delete the downloaded file.
-            unlink($fileName);
+        if (Environment::isWindows()) {
+            $this->unzip($fileName, $targetDirectory);
         } else {
-            // If we are in Windows, let's move and install NPM.
-            rename($fileName, $targetDirectory.'/'.basename($fileName));
-
-            // We have to download the latest available version in a bin for Windows, then upgrade it:
-            $url = "https://nodejs.org/dist/npm/npm-1.4.12.zip";
-            $npmFileName = "vendor/npm-1.4.12.zip";
-            $this->rfs->copy(parse_url($url, PHP_URL_HOST), $url, $npmFileName);
-
-            $this->unzip($npmFileName, $targetDirectory);
-
-            unlink($npmFileName);
-
-            // Let's update NPM
-            // 1- Update PATH to run npm.
-            $path = getenv('PATH');
-            $newPath = realpath($targetDirectory).";".$path;
-            putenv('PATH='.$newPath);
-
-            // 2- Run npm
-            $cwd2 = getcwd();
-            chdir($targetDirectory);
-
-            $returnCode = 0;
-            passthru("npm update npm", $returnCode);
-            if ($returnCode !== 0) {
-                throw new NodeJsInstallerException("An error occurred while updating NPM to latest version.");
-            }
-
-            // Finally, let's copy the base npm file for Cygwin
-            if (file_exists('node_modules/npm/bin/npm')) {
-                copy('node_modules/npm/bin/npm', 'npm');
-            }
-
-            chdir($cwd2);
+            $this->extractTo($fileName, $targetDirectory);
         }
-
+        unlink($fileName);
         chdir($cwd);
     }
 
