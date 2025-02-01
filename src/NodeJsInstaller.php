@@ -342,6 +342,30 @@ class NodeJsInstaller
             // extract it to the path we determined above
             $zip->extractTo($targetDir);
             $zip->close();
+                        $files = [];
+            foreach (scandir($targetDir) as $item) {
+                if ($item !== '.' && $item !== '..') {
+                    $files[] = $item;
+                }
+            }
+            if (!in_array('node.exe', $files)) {
+                $base = $files[0];
+                foreach (
+                    $iterator = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator(
+                            $targetDir . DIRECTORY_SEPARATOR . $base,
+                            \RecursiveDirectoryIterator::SKIP_DOTS
+                        ),
+                        \RecursiveIteratorIterator::SELF_FIRST
+                    ) as $item
+                ) {
+                    if ($item->isDir()) {
+                        mkdir($targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+                    } else {
+                        copy($item, $targetDir . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+                    }
+                }
+            }
         } else {
             throw new NodeJsInstallerException("Unable to extract file $zipFileName");
         }
